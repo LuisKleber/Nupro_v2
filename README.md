@@ -2,7 +2,7 @@
 
 > **Sistema de Proteção contra Violência à Mulher**  
 > Projeto Acadêmico — Engenharia de Software | FATEC  
-> PHP 8+ · MySQL · Lei Maria da Penha (Nº 11.340/2006)
+> PHP 8+ · MySQL · Docker · Lei Maria da Penha (Nº 11.340/2006)
 
 ---
 
