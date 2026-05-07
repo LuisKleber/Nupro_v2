@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: nupro_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nupro_v2
+      MYSQL_USER: nupro
+      MYSQL_PASSWORD: nupro123
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: php:8.2-apache
+    container_name: nupro_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_NAME: nupro_v2
+      DB_USER: nupro
+      DB_PASS: nupro123
+      ENCRYPTION_KEY: "nupro_v2_chave_aes_256_fatec_2025"
+      APP_TIMEZONE: "America/Sao_Paulo"
+    command: >
+      bash -c "
+        docker-php-ext-install mysqli &&
+        a2enmod rewrite &&
+        apache2-foreground
+      "
+
+volumes:
+  db_data:
