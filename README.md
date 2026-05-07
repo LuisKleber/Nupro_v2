@@ -78,25 +78,203 @@ O **NUPRO+** é um sistema de gestão local desenvolvido para apoiar Núcleos de
 
 ---
 
-## 🚀 Instalação e Execução
+# NUPRO+ V2 — Guia de Instalação com Docker
 
+> Projeto acadêmico | FATEC | PHP 8.2 + MySQL 8.0 + Docker
+
+---
+
+## 📋 Pré-requisitos
+
+Você precisa ter instalado:
+
+| Software | Versão mínima | Download |
+|---|---|---|
+| Docker Desktop | 4.x | https://www.docker.com/products/docker-desktop |
+| Git (opcional) | qualquer | https://git-scm.com |
+
+> **Não** precisa de XAMPP, PHP, Apache ou MySQL instalados na máquina.
+
+---
+
+## 🚀 Instalação passo a passo
+
+### 1. Baixe / extraia o projeto
+
+Se recebeu um `.zip`, extraia para uma pasta.  
+Se clonou via Git:
 ```bash
-# 1. Copie a pasta para o diretório raiz do XAMPP
-cp -r nupro_v2/ C:\xampp\htdocs\
-
-# 2. Inicie Apache e MySQL no painel do XAMPP
-
-# 3. Abra o phpMyAdmin
-http://localhost/phpmyadmin
-
-# 4. Crie o banco importando o arquivo SQL
-# Database > Import > selecione: sql/database.sql
-
-# 5. Acesse o sistema no navegador
-http://localhost/nupro_v2/
+git clone <url-do-repositorio> nupro-v2
+cd nupro-v2
 ```
 
-> **Nota:** O arquivo `sql/database.sql` cria o banco `nupro_v2`, todas as tabelas e os usuários iniciais automaticamente.
+### 2. Inicie os containers
+
+Abra o terminal **dentro da pasta do projeto** (onde está o `docker-compose.yml`) e execute:
+
+```bash
+docker compose up -d
+```
+
+Na primeira vez isso vai:
+- Baixar as imagens do PHP e MySQL (~500MB)
+- Criar o banco de dados automaticamente
+- Executar o `sql/schema.sql` com todas as tabelas e dados de demonstração
+- Iniciar o servidor Apache
+
+⏳ Aguarde cerca de **30–60 segundos** na primeira execução.
+
+### 3. Acesse o sistema
+
+Abra o navegador em: **http://localhost:8080**
+
+---
+
+## 👤 Usuários de demonstração
+
+Todos os usuários têm a senha: **`nupro123`**
+
+| E-mail | Perfil | Acesso |
+|---|---|---|
+| `admin@nupro.local` | Administrador | Total |
+| `coord@nupro.local` | Coordenação | Gerencial + auditoria |
+| `pm@nupro.local` | Polícia Militar | Ocorrências + pânico |
+| `saude@nupro.local` | Saúde | Atendimentos médicos |
+| `psico@nupro.local` | Psicologia | Rede de apoio |
+| `assistencia@nupro.local` | Assistência Social | Rede de apoio |
+| `diretoria@nupro.local` | Diretoria | Dashboard analítico |
+
+---
+
+## 📁 Estrutura do projeto
+
+```
+nupro-v2/
+├── docker-compose.yml       ← Orquestração Docker
+├── sql/
+│   └── schema.sql           ← Banco de dados + dados demo
+├── includes/
+│   ├── config.php           ← Core: DB, sessão, RBAC, crypto, audit
+│   ├── header.php           ← Layout do sidebar + topbar
+│   └── footer.php           ← Fechamento do HTML
+├── index.php                ← Login
+├── logout.php               ← Logout
+├── dashboard.php            ← KPIs e gráficos
+├── victims.php              ← Cadastro de vítimas
+├── occurrences.php          ← Registro de ocorrências
+├── protective_measures.php  ← Medidas protetivas
+├── health_visits.php        ← Atendimentos de saúde
+├── support_network.php      ← Rede de apoio
+├── panic_button.php         ← Botão de pânico
+├── map.php                  ← Mapa Leaflet
+├── users.php                ← Gestão de usuários
+└── audit.php                ← Trilha de auditoria
+```
+
+---
+
+## 🛠️ Comandos úteis
+
+### Ver logs do servidor
+```bash
+docker compose logs -f app
+```
+
+### Ver logs do banco
+```bash
+docker compose logs -f db
+```
+
+### Parar os containers
+```bash
+docker compose down
+```
+
+### Parar e apagar o banco (reset completo)
+```bash
+docker compose down -v
+```
+
+### Reiniciar após mudança de código
+```bash
+docker compose restart app
+```
+
+### Acessar o MySQL diretamente
+```bash
+docker exec -it nupro_db mysql -u nupro -pnupro123 nupro_v2
+```
+
+### Acessar o container PHP
+```bash
+docker exec -it nupro_app bash
+```
+
+---
+
+## ⚙️ Variáveis de ambiente
+
+Definidas no `docker-compose.yml`:
+
+| Variável | Valor padrão | Descrição |
+|---|---|---|
+| `DB_HOST` | `db` | Host do MySQL (nome do serviço Docker) |
+| `DB_NAME` | `nupro_v2` | Nome do banco |
+| `DB_USER` | `nupro` | Usuário MySQL |
+| `DB_PASS` | `nupro123` | Senha MySQL |
+| `ENCRYPTION_KEY` | `nupro_v2_chave_...` | Chave AES-256 para criptografia |
+| `APP_TIMEZONE` | `America/Sao_Paulo` | Fuso horário |
+
+---
+
+## 🔒 Segurança implementada
+
+| Mecanismo | Implementação |
+|---|---|
+| Autenticação | Sessão PHP + `password_verify()` bcrypt |
+| RBAC | `require_roles([...])` em cada página |
+| SQL Injection | 100% prepared statements (`mysqli`) |
+| XSS | `htmlspecialchars()` via `e()` em todo output |
+| Criptografia | AES-256-CBC para endereço e telefone |
+| Auditoria | `audit_log()` em todos os eventos |
+| PRG Pattern | Post/Redirect/Get em todos os formulários |
+
+---
+
+## ❓ Solução de problemas
+
+**O site não abre / "Connection refused"**
+```bash
+docker compose ps   # verifique se os containers estão "Up"
+docker compose logs app  # veja erros do PHP/Apache
+```
+
+**Erro de banco de dados**
+```bash
+docker compose logs db  # veja se o MySQL subiu corretamente
+# Aguarde mais alguns segundos e recarregue a página
+```
+
+**Mudei o código mas não refletiu**
+- Edite os arquivos normalmente — o Docker monta a pasta local diretamente.
+- Não precisa reiniciar para mudanças de PHP.
+
+**Quero resetar o banco para o estado inicial**
+```bash
+docker compose down -v   # apaga o volume do banco
+docker compose up -d     # recria tudo do zero
+```
+
+---
+
+## 🎓 Referências do projeto
+
+- PHP 8: https://www.php.net/manual/pt_BR/
+- Chart.js: https://www.chartjs.org/docs/
+- Leaflet: https://leafletjs.com/reference.html
+- OWASP PHP: https://owasp.org/www-project-php-security-guide/
+- Docker Compose: https://docs.docker.com/compose/
+- Lei Maria da Penha: https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2006/lei/l11340.htm
 
 ---
 
