@@ -290,29 +290,31 @@ graph TB
         Leaflet["Leaflet.js (Mapa)"]
     end
 
-    subgraph Servidor["⚙️ Servidor XAMPP"]
-        subgraph PHP["PHP 8 Application"]
+    subgraph Docker["🐳 Docker Environment"]
+
+        subgraph PHP["PHP Container"]
             direction TB
-            Config["includes/config.php\n(Funções globais, DB, Crypto, RBAC)"]
-            Header["includes/header.php\n(Layout + Auth guard)"]
-            Footer["includes/footer.php\n(Fechamento HTML)"]
+
+            Config["includes/config.php"]
+            Header["includes/header.php"]
+            Footer["includes/footer.php"]
 
             subgraph Modulos["Módulos da Aplicação"]
-                Index["index.php\n(Login)"]
-                Dashboard["dashboard.php\n(Painel)"]
-                Victims["victims.php\n(Vítimas)"]
-                Occ["occurrences.php\n(Ocorrências)"]
-                Support["support_network.php\n(Rede de Apoio)"]
-                Health["health_visits.php\n(Saúde)"]
-                Protect["protective_measures.php\n(Medidas)"]
-                Panic["panic_button.php\n(Pânico)"]
-                MapP["map.php\n(Mapa)"]
-                Audit["audit.php\n(Auditoria)"]
-                Users["users.php\n(Usuários)"]
+                Index["index.php"]
+                Dashboard["dashboard.php"]
+                Victims["victims.php"]
+                Occ["occurrences.php"]
+                Support["support_network.php"]
+                Health["health_visits.php"]
+                Protect["protective_measures.php"]
+                Panic["panic_button.php"]
+                MapP["map.php"]
+                Audit["audit.php"]
+                Users["users.php"]
             end
         end
 
-        subgraph MySQL["🗄️ MySQL — nupro_v2"]
+        subgraph MySQL["🗄️ MySQL Container"]
             TUsers["users"]
             TVictims["victims"]
             TOcc["occurrences"]
@@ -325,11 +327,11 @@ graph TB
     end
 
     UI -->|HTTP Request| Modulos
-    Config -->|Singleton| MySQL
+    Config -->|PDO Connection| MySQL
     Header -->|require_once| Config
     Modulos -->|require_once| Header
     Modulos -->|require_once| Footer
-    Modulos -->|SQL Prepared Stmts| MySQL
+    Modulos -->|Prepared Statements| MySQL
     UI --> ChartJS
     UI --> Leaflet
     Leaflet -->|Tiles| OSM["🌍 OpenStreetMap CDN"]
