@@ -71,9 +71,10 @@ O **NUPRO+** é um sistema de gestão local desenvolvido para apoiar Núcleos de
 
 ## 📦 Requisitos
 
-- XAMPP com Apache + MySQL iniciados
-- PHP 8.0 ou superior
-- Extensão OpenSSL habilitada no PHP (`extension=openssl` no php.ini)
+- Docker Desktop
+- Docker Compose
+- Git
+- Navegador web moderno
 - Conexão com internet (para carregar Chart.js e Leaflet via CDN)
 
 ---
