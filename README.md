@@ -60,7 +60,7 @@ O **NUPRO+** é um sistema de gestão local desenvolvido para apoiar Núcleos de
 |---|---|
 | Backend | PHP 8+ |
 | Banco de Dados | MySQL 5.7+ / MariaDB |
-| Servidor Local | XAMPP (Apache + MySQL) |
+| Servidor Local | (Docker + MySQL) |
 | Frontend | HTML5, CSS3 (Custom Properties), JavaScript ES6 |
 | Gráficos | [Chart.js](https://www.chartjs.org/) (via CDN) |
 | Mapas | [Leaflet.js](https://leafletjs.com/) + OpenStreetMap (via CDN) |
@@ -341,12 +341,12 @@ graph TB
 
 ```mermaid
 flowchart LR
-    Request(["HTTP Request"]) --> Router["PHP Page\n(Controller)"]
-    Router -->|POST| Logic["Business Logic\n+ Validação"]
+    Request(["HTTP Request"]) --> Router["PHP Page<br/>(Controller)"]
+    Router -->|POST| Logic["Business Logic<br/>Validação"]
     Logic -->|INSERT/SELECT| DB[("MySQL")]
     DB --> Logic
-    Logic -->|flash() + redirect| Router
-    Router -->|GET| View["HTML View\n(PHP Template)"]
+    Logic -->|flash e redirect| Router
+    Router -->|GET| View["HTML View<br/>PHP Template"]
     View --> Response(["HTTP Response"])
 ```
 
