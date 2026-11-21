@@ -31,8 +31,9 @@ while ($row = $res2->fetch_assoc()) $panic_markers[] = $row;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const map = L.map('map').setView([-22.4339, -46.9533], 13);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; CartoDB', maxZoom: 19
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
 const riskColors = { A: '#e8365d', B: '#f59e0b', C: '#10b981' };
